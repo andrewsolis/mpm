@@ -175,6 +175,12 @@ bool mpm::MPMExplicit<Tdim>::solve() {
 #endif
     }
   }
+
+  #if defined(USE_VTK) && defined(USE_GALAXY)
+  // send results to galaxy
+  console_->info("Send Data to Galaxy");
+  #endif
+
   auto solver_end = std::chrono::steady_clock::now();
   console_->info("Rank {}, Explicit {} solver duration: {} ms", mpi_rank,
                  mpm_scheme_->scheme(),

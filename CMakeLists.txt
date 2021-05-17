@@ -41,6 +41,9 @@ option(MPM_BUILD_TESTING "enable testing for mpm" ON)
 # Halo exchange
 option(HALO_EXCHANGE "Enable halo exchange" OFF)
 
+# Galaxy Send Data to Galaxy Back-End
+option( GALAXY "Send VTK data to Galaxy" OFF)
+
 # CMake Modules
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
@@ -118,6 +121,9 @@ if (VTK_FOUND)
   add_definitions("-DUSE_VTK")
   include_directories(${VTK_INCLUDE_DIRS})
   link_libraries(${VTK_LIBRARIES})
+  if(GALAXY)
+    add_definitions("-DUSE_GALAXY")
+  endif()
 endif()
 
 # Partio

@@ -47,7 +47,7 @@ if (MPI_CXX_FOUND)
     )
 
   find_library(KAHIP_LIBRARY libkahip.a
-    HINTS ${KAHIP_ROOT}/deploy $ENV{KAHIP_ROOT}/deploy /usr/local/KaHIP/deploy
+    HINTS ${KAHIP_ROOT}/deploy $ENV{KAHIP_ROOT}/deploy /usr/local/KaHIP/deploy /Users/ajs2987/projects/KaHIP/deploy
     NO_DEFAULT_PATH
     DOC "Directory where the KaHIP library is located"
     )
@@ -57,7 +57,7 @@ if (MPI_CXX_FOUND)
   )
 
   find_library(MKAHIP_LIBRARY kahip
-    HINTS ${KAHIP_ROOT}/deploy/parallel $ENV{KAHIP_ROOT}/deploy/parallel /usr/local/KaHIP/deploy/parallel
+    HINTS ${KAHIP_ROOT}/deploy/parallel $ENV{KAHIP_ROOT}/deploy/parallel /usr/local/KaHIP/deploy/parallel /Users/ajs2987/projects/KaHIP/deploy/parallel
     NO_DEFAULT_PATH
     DOC "Directory where the parallel KaHIP library is located"
   )
@@ -67,7 +67,7 @@ if (MPI_CXX_FOUND)
   )
 
   find_library(PARHIP_LIBRARY parhip
-    HINTS ${KAHIP_ROOT}/deploy $ENV{KAHIP_ROOT}/deploy /usr/local/KaHIP/deploy
+    HINTS ${KAHIP_ROOT}/deploy $ENV{KAHIP_ROOT}/deploy /usr/local/KaHIP/deploy /Users/ajs2987/projects/KaHIP/deploy
     NO_DEFAULT_PATH
     DOC "Directory where the ParHIP interface is located"
   )

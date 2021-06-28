@@ -68,6 +68,8 @@ class MPM {
   virtual void write_hdf5(mpm::Index step, mpm::Index max_steps) = 0;
 
 #ifdef USE_VTK
+  //! setup galaxy backend
+  virtual void setup_galaxy() = 0;
   //! Write VTK files
   virtual void write_vtk(mpm::Index step, mpm::Index max_steps) = 0;
 #endif

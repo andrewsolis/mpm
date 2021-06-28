@@ -492,6 +492,12 @@ void mpm::MPMBase<Tdim>::write_hdf5(mpm::Index step, mpm::Index max_steps) {
 }
 
 #ifdef USE_VTK
+
+template <unsigned Tdim>
+void mpm::MPMBase<Tdim>::setup_galaxy()
+{
+  
+}
 //! Write VTK files
 template <unsigned Tdim>
 void mpm::MPMBase<Tdim>::write_vtk(mpm::Index step, mpm::Index max_steps) {

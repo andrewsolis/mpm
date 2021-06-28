@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "data_types.h"
+#include "Skt.hpp"
 
 //! VTK Writer class
 //! \brief VTK writer class
@@ -83,6 +84,7 @@ class VtkWriter {
  private:
   //! Vector of nodal coordinates
   vtkSmartPointer<vtkPoints> points_;
+  gxy::ClientSkt *master_socket;
 };
 
 #endif

@@ -280,4 +280,164 @@ void VtkWriter::write_parallel_vtk(const std::string& filename,
   pvtk.close();
 }
 
+void VtkWriter::setup_galaxy(int mpi_size, int mpi_rank)
+{
+
+  // master_socket = (mpi_rank == 0) ? new gxy::ClientSkt("localhost", 1900) : NULL;
+
+  // int status = 0;
+  // int sz;
+  // char *hoststring = NULL;
+
+  // if ( master_socket->Connect() )
+  // {
+  //   status = 1;
+
+  //   if (status && !master_socket->Send(std::string("box")))
+  //     status = 0;
+
+  //   float box[] = {gxmin, gymin, gzmin, gxmax, gymax, gzmax};
+  //   if (status && !master_socket->Send((void *)box, 6*sizeof(float)))
+  //     status = 0;
+
+  //   std::stringstream ss;
+  //   ss << "nsenders " << n_senders;
+  //   if (status && !master_socket->Send(ss.str()))
+  //     status = 0;
+
+  //   if (status && !master_socket->Send(std::string("sendhosts")))
+  //     status = 0;
+  
+  //   if (status && ((hoststring = master_socket->Receive()) == NULL))
+  //     status = 0;
+
+  //   if (status && !master_socket->Send(std::string("go")))
+  //     status = 0;
+
+  //   master_socket->Disconnect();
+
+  // }
+}
+
+void VtkWriter::create_data(const std::string& data_field, unsigned step)
+{
+  sender_id = step;
+  bufhdr *hdr;
+
+  vtkPointSet *ps;
+  ps->SetPoints(points_);
+
+  vtkPoints *vpts = ps->GetPoints();
+  nPts = ps->GetNumberOfPoints();
+
+  dsz = sizeof(int) + sizeof(bufhdr)+ nPts*4*sizeof(float);
+  data = (char *)malloc(dsz);
+  *(int *)data = dsz;
+
+  hdr = (bufhdr *)(data + sizeof(int));
+  float *pdst = (float *)(hdr + 1);
+  float *ddst = pdst + 3*nPts;
+
+  vtkFloatArray *pArray = vtkFloatArray::SafeDownCast(vpts->GetData());
+  if (pArray)
+    memcpy(pdst, pArray->GetVoidPointer(0), nPts * 3 * sizeof(float));
+  else
+  {
+    vtkDoubleArray *pArray = vtkDoubleArray::SafeDownCast(vpts->GetData());
+    if (! pArray)
+    {
+      std::cerr << "points have to be float or double\n";
+      exit(1);
+    }
+
+    double *psrc = (double *)pArray->GetVoidPointer(0);
+    for (int i = 0; i < 3*nPts; i++)
+      *pdst++ = (float)*psrc++;
+  }
+
+  vtkFloatArray *fArray = vtkFloatArray::SafeDownCast(ps->GetPointData()->GetArray(data_field.c_str()));
+  if (fArray)
+  {
+    float *fsrc = (float *)fArray->GetVoidPointer(0);
+
+    if (fArray->GetNumberOfComponents() == 1)
+    {
+      memcpy(ddst, fArray->GetVoidPointer(0), nPts * sizeof(float));
+    }
+    else if (fArray->GetNumberOfComponents() == 3)
+    {
+      for (int i = 0; i < nPts; i++)
+      {
+        double a = fsrc[0]*fsrc[0] + fsrc[1]*fsrc[1] + fsrc[2]*fsrc[2];
+        *ddst++ = sqrt(a);
+        fsrc += 3;
+      }
+    }
+    else
+    {
+      std::cerr << "data have to be scalar or 3-vector\n";
+      exit(1);
+    }
+  }
+  else
+  {
+    vtkDoubleArray *dArray = vtkDoubleArray::SafeDownCast(ps->GetPointData()->GetArray("displacements"));
+    if (! dArray)
+    {
+      std::cerr << "data have to be float or double\n";
+      exit(1);
+    }
+
+    double *dsrc = (double *)dArray->GetVoidPointer(0);
+
+    if (dArray->GetNumberOfComponents() == 1)
+    {
+      for (int i = 0; i < nPts; i++)
+        *ddst++ = *dsrc++;
+    }
+    else if (dArray->GetNumberOfComponents() == 3)
+    {
+      for (int i = 0; i < nPts; i++)
+      {
+        double a = dsrc[0]*dsrc[0] + dsrc[1]*dsrc[1] + dsrc[2]*dsrc[2];
+        *ddst++ = sqrt(a);
+        dsrc += 3;
+      }
+    }
+    else
+    {
+      std::cerr << "data have to be scalar or 3-vector\n";
+      exit(1);
+    }
+  }
+
+  hdr->type          = bufhdr::Particles; 
+  hdr->origin        = sender_id;
+  hdr->has_data      = true;
+  hdr->npoints       = nPts;
+  hdr->nconnectivity = 0;
+
+  float *pptr = (float *)(data + sizeof(int) + sizeof(bufhdr));
+  float *dptr = pptr + 3*nPts;
+
+  xmin = xmax = pptr[0];
+  ymin = ymax = pptr[1];
+  zmin = zmax = pptr[2];
+  dmin = dmax = *dptr;
+
+  for (int i = 0; i < nPts; i++)
+  {
+    if (xmin > pptr[0]) xmin = pptr[0];
+    if (xmax < pptr[0]) xmax = pptr[0];
+    if (ymin > pptr[1]) ymin = pptr[1];
+    if (ymax < pptr[1]) ymax = pptr[1];
+    if (zmin > pptr[2]) zmin = pptr[2];
+    if (zmax < pptr[2]) zmax = pptr[2];
+    if (dmin > *dptr) dmin = *dptr;
+    if (dmax < *dptr) dmax = *dptr;
+    pptr += 3;
+    dptr ++;
+  }
+}
+
 #endif

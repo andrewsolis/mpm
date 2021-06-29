@@ -19,6 +19,7 @@
 #include <vtkVertexGlyphFilter.h>
 #include <vtkXMLPolyDataWriter.h>
 #include <vtkZLibDataCompressor.h>
+#include <vtkFloatArray.h>
 
 #include <fstream>
 #include <string>
@@ -26,6 +27,7 @@
 
 #include "data_types.h"
 #include "Skt.hpp"
+#include "bufhdr.h"
 
 //! VTK Writer class
 //! \brief VTK writer class
@@ -81,10 +83,22 @@ class VtkWriter {
                           unsigned step, unsigned max_steps,
                           unsigned ncomponents = 3);
 
+void setup_galaxy(int mpi_rank = 0, int mpi_size = 1);
+
+void create_data(const std::string& data_field, unsigned step);
+
  private:
   //! Vector of nodal coordinates
   vtkSmartPointer<vtkPoints> points_;
+
+  //! galaxy variables
+  int sender_id;
+  size_t dsz = -1;
+  char *data = NULL;
   gxy::ClientSkt *master_socket;
+  float xmin = -1, xmax = 1, ymin = -1, ymax = 1, zmin = -1, zmax = 1, dmin = 0, dmax = 1;
+  int n_senders = 1; 
+  int nPts = -1;
 };
 
 #endif

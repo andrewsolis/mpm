@@ -280,43 +280,90 @@ void VtkWriter::write_parallel_vtk(const std::string& filename,
   pvtk.close();
 }
 
-void VtkWriter::setup_galaxy(int mpi_size, int mpi_rank)
+int VtkWriter::setup_galaxy(int mpi_size, int mpi_rank)
 {
+  master_socket = (mpi_rank == 0) ? new gxy::ClientSkt("localhost", 1900) : NULL;
 
-  // master_socket = (mpi_rank == 0) ? new gxy::ClientSkt("localhost", 1900) : NULL;
+  int status = 0;
+  int sz;
+  char *hoststring = NULL;
 
-  // int status = 0;
-  // int sz;
-  // char *hoststring = NULL;
+  if (master_socket && master_socket->Connect())
+  {
+    status = 1;
 
-  // if ( master_socket->Connect() )
-  // {
-  //   status = 1;
+    if (status && !master_socket->Send(std::string("box")))
+      status = 0;
 
-  //   if (status && !master_socket->Send(std::string("box")))
-  //     status = 0;
+    float box[] = {xmin, ymin, zmin, xmax, ymax, zmax};
+    if (status && !master_socket->Send((void *)box, 6*sizeof(float)))
+      status = 0;
 
-  //   float box[] = {gxmin, gymin, gzmin, gxmax, gymax, gzmax};
-  //   if (status && !master_socket->Send((void *)box, 6*sizeof(float)))
-  //     status = 0;
+    std::stringstream ss;
+    ss << "nsenders " << n_senders;
+    if (status && !master_socket->Send(ss.str()))
+      status = 0;
 
-  //   std::stringstream ss;
-  //   ss << "nsenders " << n_senders;
-  //   if (status && !master_socket->Send(ss.str()))
-  //     status = 0;
-
-  //   if (status && !master_socket->Send(std::string("sendhosts")))
-  //     status = 0;
+    if (status && !master_socket->Send(std::string("sendhosts")))
+      status = 0;
   
-  //   if (status && ((hoststring = master_socket->Receive()) == NULL))
-  //     status = 0;
+    if (status && ((hoststring = master_socket->Receive()) == NULL))
+      status = 0;
 
-  //   if (status && !master_socket->Send(std::string("go")))
-  //     status = 0;
+    if (status && !master_socket->Send(std::string("go")))
+      status = 0;
 
-  //   master_socket->Disconnect();
+    master_socket->Disconnect();
+  }
 
-  // }
+    sz = status ? strlen(hoststring) : -1;
+
+    // MPI_Bcast(&status, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+  if (status)
+  {
+    if (mpi_rank > 0)
+      hoststring = (char *)malloc(sz);
+  
+    // MPI_Bcast(&hoststring, sz, MPI_CHAR, 0, MPI_COMM_WORLD);
+
+    std::vector<char *> hosts;
+    hosts.push_back(hoststring);
+
+    for (char *c = hoststring; *c; c++)
+    {
+      if (*c == ':') *c = ' ';
+      else if (*c == ';')
+      {
+        *c = '\0';
+        if (*(c+1) != '\0')
+          hosts.push_back(c+1);
+      }
+    }
+
+    int senders_per_rank = n_senders / mpi_size;
+    int sender_start = mpi_rank * senders_per_rank;
+    int sender_end   = (mpi_rank == mpi_size-1) ? n_senders : (mpi_rank+1) * senders_per_rank;
+
+    for (int i = 0;  i < (sender_end - sender_start); i++)
+    {
+      int j = (i + sender_start) % hosts.size();
+
+      char host[256]; int port;
+
+      stringstream ss(hosts[j]);
+      ss >> host >> port;
+
+      dest_host = host;
+      dest_port = port;
+    }
+  }
+
+  if (hoststring)
+    free(hoststring);
+
+  return status;
+
 }
 
 void VtkWriter::create_data(const std::string& data_field, unsigned step)
@@ -437,6 +484,20 @@ void VtkWriter::create_data(const std::string& data_field, unsigned step)
     if (dmax < *dptr) dmax = *dptr;
     pptr += 3;
     dptr ++;
+  }
+}
+
+bool VtkWriter::send_data()
+{
+  if (dest_port == -1)
+  {
+    std::cerr << "Can't send data without knowing where!\n";
+    return false;
+  }
+  else
+  {
+    gxy::ClientSkt c(dest_host, dest_port);
+    return c.Connect() && c.Send(data, dsz);
   }
 }
 

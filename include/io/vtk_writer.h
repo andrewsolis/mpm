@@ -83,9 +83,12 @@ class VtkWriter {
                           unsigned step, unsigned max_steps,
                           unsigned ncomponents = 3);
 
-void setup_galaxy(int mpi_rank = 0, int mpi_size = 1);
+int setup_galaxy(int mpi_rank = 0, int mpi_size = 1);
 
 void create_data(const std::string& data_field, unsigned step);
+
+bool send_data();
+
 
  private:
   //! Vector of nodal coordinates
@@ -99,6 +102,9 @@ void create_data(const std::string& data_field, unsigned step);
   float xmin = -1, xmax = 1, ymin = -1, ymax = 1, zmin = -1, zmax = 1, dmin = 0, dmax = 1;
   int n_senders = 1; 
   int nPts = -1;
+
+  std::string dest_host;
+  int dest_port;
 };
 
 #endif

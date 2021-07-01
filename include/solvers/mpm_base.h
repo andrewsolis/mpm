@@ -72,6 +72,10 @@ class MPMBase : public MPM {
   bool checkpoint_resume() override;
 
 #ifdef USE_VTK
+
+  #ifdef USE_GALAXY
+  void write_galaxy( mpm::Index step ) override;
+  #endif
   //! Write VTK files
   void write_vtk(mpm::Index step, mpm::Index max_steps) override;
 #endif

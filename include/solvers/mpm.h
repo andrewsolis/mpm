@@ -19,6 +19,10 @@
 #include "vtk_writer.h"
 #endif
 
+#ifdef USE_GALAXY
+#include "galaxy_writer.h"
+#endif
+
 #ifdef USE_PARTIO
 #include "partio_writer.h"
 #endif
@@ -68,6 +72,10 @@ class MPM {
   virtual void write_hdf5(mpm::Index step, mpm::Index max_steps) = 0;
 
 #ifdef USE_VTK
+
+#ifdef USE_GALAXY
+  virtual void write_galaxy( mpm::Index step ) = 0;
+#endif
   //! Write VTK files
   virtual void write_vtk(mpm::Index step, mpm::Index max_steps) = 0;
 #endif

@@ -495,9 +495,19 @@ void mpm::MPMBase<Tdim>::write_hdf5(mpm::Index step, mpm::Index max_steps) {
 
 #ifdef USE_GALAXY
 template <unsigned Tdim>
-void mpm::MPMBase<Tdim>::write_galaxy( mpm::Index step ) 
+void mpm::MPMBase<Tdim>::write_galaxy( ) 
 {
-  
+  auto gxy_writer =  std::make_unique<GxyWriter>(mesh_->particle_coordinates());
+
+  //! Scalar variables
+  for (const auto& attribute : vtk_vars_.at(mpm::VariableType::Scalar)) {
+    gxy_writer->write( attribute );
+  }
+
+  //! VTK vector variables
+  for (const auto& attribute : vtk_vars_.at(mpm::VariableType::Vector)) {
+    gxy_writer->write( attribute );
+  }
 }
 #endif
 

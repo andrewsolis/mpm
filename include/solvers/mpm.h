@@ -74,7 +74,7 @@ class MPM {
 #ifdef USE_VTK
 
 #ifdef USE_GALAXY
-  virtual void write_galaxy( mpm::Index step ) = 0;
+  virtual void write_galaxy( ) = 0;
 #endif
   //! Write VTK files
   virtual void write_vtk(mpm::Index step, mpm::Index max_steps) = 0;

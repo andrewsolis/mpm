@@ -2,6 +2,12 @@
 
 #ifdef USE_GALAXY
 
+class gxy_data
+{
+  size_t dsz = -1;
+  char *data = NULL;
+};
+
 //! Gxy Writer class Constructor with coordniates
 //! \param[in] coordinate Point coordinates
 //! \param[in] node_pairs Node ID pairs to form elements
@@ -17,9 +23,19 @@ GxyWriter::GxyWriter(
   }
 }
 
-void GxyWriter::create_data( const std::string& data_field, unsigned step )
+void GxyWriter::create_data( const std::string& data_field )
 {
-    
+  
+}
+
+void GxyWriter::write( const std::string& data_field )
+{
+    // create data to send
+
+    if( !first_run )
+    {
+        // setup master_socket
+    }
 }
 
 

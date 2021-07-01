@@ -74,7 +74,7 @@ class MPMBase : public MPM {
 #ifdef USE_VTK
 
   #ifdef USE_GALAXY
-  void write_galaxy( mpm::Index step ) override;
+  void write_galaxy( ) override;
   #endif
   //! Write VTK files
   void write_vtk(mpm::Index step, mpm::Index max_steps) override;

@@ -28,22 +28,16 @@ class GxyWriter {
   public:
       GxyWriter(const std::vector<Eigen::Matrix<double, 3, 1>>& coordinates);
 
-      void create_data( const std::string& data_field, unsigned step );
+      void create_data( const std::string& data_field );
+
+      void write( const std::string& data_field );
     
   private:
     //! Vector of nodal coordinates
     vtkSmartPointer<vtkPoints> points_;
 
-      int sender_id;
-      size_t dsz = -1;
-      char *data = NULL;
-      gxy::ClientSkt *master_socket;
-      float xmin = -1, xmax = 1, ymin = -1, ymax = 1, zmin = -1, zmax = 1, dmin = 0, dmax = 1;
-      int n_senders = 1; 
-      int nPts = -1;
+    bool first_run = false;
 
-      std::string dest_host;
-      int dest_port;
 };
 
 #endif

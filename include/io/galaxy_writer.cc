@@ -6,6 +6,10 @@ class gxy_data
 {
   size_t dsz = -1;
   char *data = NULL;
+  float xmin = -1, xmax = 1, ymin = -1, ymax = 1, zmin = -1, zmax = 1, dmin = 0, dmax = 1;
+  int step; //sender_id
+  int port = -1;
+  int nPts = -1;
 };
 
 //! Gxy Writer class Constructor with coordniates

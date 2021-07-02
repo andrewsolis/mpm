@@ -21,6 +21,7 @@
 #include <vtkFloatArray.h>
 
 #include "Skt.hpp"
+#include "bufhdr.h"
 
 //! VTK Writer class
 //! \brief VTK writer class

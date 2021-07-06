@@ -24,19 +24,45 @@
 #include "Skt.hpp"
 #include "bufhdr.h"
 
-//! VTK Writer class
-//! \brief VTK writer class
+class GXY_Data
+{
+  public:
+    size_t dsz = -1;
+    char *data = NULL;
+    float xmin = -1, xmax = 1, ymin = -1, ymax = 1, zmin = -1, zmax = 1, dmin = 0, dmax = 1;
+    int step; //sender_id
+    int nPts = -1;
+
+    GXY_Data( vtkPoints* pts, const std::string& fieldname, unsigned timestep );
+};
+
+//! Galaxy Writer class
+//! \brief Galaxy writer class
 class GxyWriter {
   public:
-      GxyWriter(const std::vector<Eigen::Matrix<double, 3, 1>>& coordinates);
+    GxyWriter(const std::vector<Eigen::Matrix<double, 3, 1>>& coordinates);
 
-      void write( const std::string& data_field, unsigned step );
+    void setup( const GXY_Data *data );
+
+    void write( const std::string& data_field, unsigned step );
+
+    void set_destination(string hst, int prt );
     
-  private:
     //! Vector of nodal coordinates
     vtkSmartPointer<vtkPoints> points_;
 
     bool first_run = false;
+
+  private:
+    gxy::ClientSkt *master_socket;
+
+    string master_host = "localhost";
+    int    base_port = 1900;
+    
+    string host = "";
+    int    port = -1;
+    
+    int    n_senders = 1;
 
 };
 

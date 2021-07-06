@@ -168,6 +168,10 @@ bool mpm::MPMExplicit<Tdim>::solve() {
 #ifdef USE_VTK
       // VTK outputs
       this->write_vtk(this->step_, this->nsteps_);
+
+#ifdef USE_GALAXY
+      this->write_galaxy( this->step_ );
+#endif
 #endif
 #ifdef USE_PARTIO
       // Partio outputs

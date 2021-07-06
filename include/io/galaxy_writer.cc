@@ -8,10 +8,10 @@ class GXY_Data
   char *data = NULL;
   float xmin = -1, xmax = 1, ymin = -1, ymax = 1, zmin = -1, zmax = 1, dmin = 0, dmax = 1;
   int step; //sender_id
-  int port = -1;
   int nPts = -1;
 
-  GXY_Data( vtkPoints* pts, const std::string& fieldname, int timestep )
+  public:
+  GXY_Data( vtkPoints* pts, const std::string& fieldname, unsigned timestep )
   {
     bufhdr *hdr;
 
@@ -145,19 +145,9 @@ GxyWriter::GxyWriter(
   }
 }
 
-void GxyWriter::create_data( const std::string& data_field )
+void GxyWriter::write( const std::string& data_field, unsigned step )
 {
-  bufhdr *hdr;
-
-  vtkPointSet *ps;
-  ps->SetPoints(points_);
-
-
-}
-
-void GxyWriter::write( const std::string& data_field )
-{
-    // create data to send
+    GXY_Data *gxy_data = new GXY_Data::GXY_Data(points_, data_field, step );
 
     if( !first_run )
     {

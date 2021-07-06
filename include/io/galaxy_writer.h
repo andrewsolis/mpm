@@ -2,6 +2,7 @@
 #define GXY_WRITER_H_
 
 #ifdef USE_VTK
+#ifdef USE_GALAXY
 
 #include <Eigen/Dense>
 
@@ -29,9 +30,7 @@ class GxyWriter {
   public:
       GxyWriter(const std::vector<Eigen::Matrix<double, 3, 1>>& coordinates);
 
-      void create_data( const std::string& data_field );
-
-      void write( const std::string& data_field );
+      void write( const std::string& data_field, unsigned step );
     
   private:
     //! Vector of nodal coordinates
@@ -41,5 +40,6 @@ class GxyWriter {
 
 };
 
+#endif
 #endif
 #endif  // GXY_WRITER_H_

@@ -182,6 +182,7 @@ void GxyWriter::setup(const GXY_Data* data)
 
   sz = status ? strlen(hoststring) : -1;
   
+  
   if(status)
   {
 

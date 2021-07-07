@@ -21,7 +21,7 @@
 #include <vtkZLibDataCompressor.h>
 #include <vtkFloatArray.h>
 
-#include "Skt.hpp"
+#include "Skt.h"
 #include "bufhdr.h"
 
 class GXY_Data

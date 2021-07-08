@@ -6,6 +6,7 @@
 
 #include <Eigen/Dense>
 
+#include <vtkPointSet.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkDoubleArray.h>
@@ -21,8 +22,13 @@
 #include <vtkZLibDataCompressor.h>
 #include <vtkFloatArray.h>
 
+#include <fstream>
+#include <string>
+#include <vector>
+
 #include "Skt.h"
 #include "bufhdr.h"
+#include "data_types.h"
 
 class GXY_Data
 {
@@ -33,7 +39,7 @@ class GXY_Data
     int step; //sender_id
     int nPts = -1;
 
-    GXY_Data( vtkPoints* pts, const std::string& fieldname, unsigned timestep );
+    GXY_Data( vtkSmartPointer<vtkPoints> pts, const std::string& fieldname, unsigned timestep );
 };
 
 //! Galaxy Writer class
